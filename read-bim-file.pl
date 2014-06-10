@@ -57,7 +57,7 @@ sub getSNPsFromBimFile{
 	
 	open INPUT, $filename or die "Unable to open $filename. Exiting\n";
 
-	foreach $ line (<INPUT>){
+	foreach $line (<INPUT>){
  		chomp;
 		@elements = split(/\t/, $line);
 			
