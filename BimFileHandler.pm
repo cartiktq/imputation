@@ -17,7 +17,8 @@ sub new{
 1; 
 
 # This subroutine parses a BIM files and returns the set of SNPs that lie
-# between two limiting positions on the chromosome
+# between two limiting positions on the chromosome. It also writes the
+# selected SNPs into a new file.
 # The limiting positions are 50 MB on either side of a SNP of interest
 # INVOKE: getDifferentSNPsFromBimFiles();
 
@@ -37,7 +38,13 @@ sub getSNPsFromBimFile{
 	my $pos;
 	my @elements;
 	
+	my @inputfilenameparts = split(/\//, $filename);
+	my @fileNameAndExtension = split(/\./, $inputfilenameparts[-1]);
+	
+	my $outputfilename = $fileNameAndExtension[0]."-selectSNPs.".$fileNameAndExtension[1];
+	
 	open (INPUT, "$filename") or die "Unable to open $filename. Exiting\n";
+	open (OUTPUT, ">$outputfilename");
 	
 	foreach $line (<INPUT>){
  		chomp($line);
@@ -48,10 +55,13 @@ sub getSNPsFromBimFile{
 		
 		if($pos <= END_POSITION && $pos >= START_POSITION){
 			$snpMap{$snpID} = $line;				
+			print OUTPUT "$line\n";
 		}
 	}	
 	
-	close INPUT;	
+	close OUTPUT;
+	close INPUT;
+		
 	return %snpMap;
 }
 

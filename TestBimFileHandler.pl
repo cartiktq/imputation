@@ -5,6 +5,25 @@ use warnings;
 
 use BimFileHandler;
 
+my $selectedOption;
+my $methodCounter = 0;
+my $maxMethodCounter = 2;
+
+print "Which methods to do you want to test? PLEASE Enter one of TWO Valid Options ((1,A)):";
+
+$selectedOption = <STDIN>;
+chomp($selectedOption);
+
+while($selectedOption !~ /[1Aa]/){
+	print "Entered Option Is Illegal. PLEASE Enter one of TWO Valid Options ((1,A)):";
+	$selectedOption = <STDIN>;
+	chomp($selectedOption);
+}
+
+if($selectedOption =~ /1/){
+	$maxMethodCounter = $selectedOption;
+}
+
 print "TEST::: Instantiating BimFileHandler\n";
 
 my $bfh = BimFileHandler->new();
@@ -16,6 +35,12 @@ my $bfh = BimFileHandler->new();
 print "TEST::: Extracting SNPs From BIM files\n";
 
 my %snpMap1 = $bfh->getSNPsFromBimFile();
+++$methodCounter;
+
+if($methodCounter >= $maxMethodCounter){
+	exit;
+}
+
 my %snpMap2 = $bfh->getSNPsFromBimFile();
 
 my @keys1 = keys %snpMap1;
