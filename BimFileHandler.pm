@@ -19,32 +19,25 @@ sub new{
 # This subroutine parses a BIM files and returns the set of SNPs that lie
 # between two limiting positions on the chromosome
 # The limiting positions are 50 MB on either side of a SNP of interest
-# INVOKE: getDifferentSNPsFromBimFiles($filename);
+# INVOKE: getDifferentSNPsFromBimFiles();
 
 sub getSNPsFromBimFile{
 
+	use constant START_POSITION => 49366316; #50 MB to left of SNP of interest
+	use constant END_POSITION => 149366316;	#50 MB to the right of SNP of interest
+
 	my %snpMap = ();
-	
-	my $snp_count = 0;
-	my $total_snp_count = 0;
 	
 	print "Enter the name of the BIM file:";
 	my $filename = <STDIN>;
 	chomp($filename);
-	print "Filename is $filename\n";
-	my $logfile = "BimFileHandlerLog.txt";
+
 	my $line;
 	my $snpID;
 	my $pos;
 	my @elements;
-	my $timestamp = localtime(time); 
-	my $pwd = getcwd;
-	
-	use constant START_POSITION => 49366316; #50 MB to left of SNP of interest
-	use constant END_POSITION => 149366316;	#50 MB to the right of SNP of interest
 	
 	open (INPUT, "$filename") or die "Unable to open $filename. Exiting\n";
-	
 	
 	foreach $line (<INPUT>){
  		chomp($line);
@@ -54,19 +47,9 @@ sub getSNPsFromBimFile{
 		$pos = $elements[3];
 		
 		if($pos <= END_POSITION && $pos >= START_POSITION){
-			$snpMap{$snpID} = $line;
-			++$snp_count;		
+			$snpMap{$snpID} = $line;				
 		}
-		++$total_snp_count;	
-	}
-	
-	#Commenting out all LOGging commands because stupid thing doesn't work
-	#	open (LOG, "<<$logfile") or die "$!";
-	
-	#	print LOG "getSNPsFromFile invoked on $filename at $timestamp\n";
-	#	print LOG "Found $snp_count SNPs in area of interest\n";
-	
-	#	close LOG;	
+	}	
 	
 	close INPUT;	
 	return %snpMap;
@@ -81,25 +64,25 @@ sub getSNPsFromBimFile{
 sub findDifferenceBetweenSnpSets{
 	my @dif = ();
 	
-	my (%list1) = %{$_[0]};
-	my (%list2) = %{$_[1]};
+	my (%map1) = %{$_[1]}; # $_[0] gives the name of the method as a ref!!! 
+	my @keys1 = keys %map1;
 	
-	my @keys1 = keys %list1;
-	my @keys2 = keys %list2;
+	my (%map2) = %{$_[2]};
+	my @keys2 = keys %map2;
 	
 	my $i;
 	my $j;
-	my $found;
+	my $found = 0;
 	
-	for($i = 0; $i < $#keys1; $i++){
-		for($j = 0; $j < $#keys2; $j++){
+	for($i = 0; $i <= $#keys1; $i++){
+		for($j = 0; $j <= $#keys2; $j++){
 			if($keys1[$i] eq $keys2[$j]){
 				$found = 1;
 				last;
 			}
 		}
 		if($found eq 0 && $keys1[$i] !~ /cnvi/){
-			push(@dif, "$list1{$keys1[$i]}");
+			push(@dif, "$map1{$keys1[$i]}");
 		}
 	}
 	
@@ -107,25 +90,24 @@ sub findDifferenceBetweenSnpSets{
 }
 
 # A method for writing lines from an array into a file
-# INVOKE: writeFile($file, @array)
+# INVOKE: writeFile(@array)
 
 sub writeFile{
 	
-	my $diff_ct = 0;
-	my($file, @dif) = @_;
+	print "Enter the name of the output BIM file:";
+	my $filename = <STDIN>;
+	chomp($filename);
+	
+	my (@dif) = @{$_[1]};
 	
 	my $line;
 	
-	open(OUTFILE, ">$file");
+	open(OUTFILE, ">$filename");
 	
 	foreach $line (@dif){
-		++$diff_ct;
-		print OUTFILE $line;
+		print OUTFILE "$line\n";
 	}
 
 	close OUTFILE;
-	
-	print "$diff_ct\n";
-	
 }
 
