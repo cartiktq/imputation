@@ -2,12 +2,11 @@
 
 use BimFileHandler;
 
-
 $bfh = BimFileHandler->new();
 
-print "opening bim file\n";
+#"../imputation/plink/chr7From1000Genes/chr7From1000Genes.bim";
 
-%snpMap = $bfh->getSNPsFromBimFile("../imputation/plink/chr7From1000Genes/chr7From1000Genes.bim");
+%snpMap = $bfh->getSNPsFromBimFile();
 
 @snps = keys %snpMap;
 

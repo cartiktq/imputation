@@ -1,9 +1,11 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
 package BimFileHandler;
 
 use strict;
 use warnings;
+
+use Cwd;
 
 #Constructor
 sub new{
@@ -17,7 +19,7 @@ sub new{
 # This subroutine parses a BIM files and returns the set of SNPs that lie
 # between two limiting positions on the chromosome
 # The limiting positions are 50 MB on either side of a SNP of interest
-# INVOKE: getDifferentSNPsFromBimFiles();
+# INVOKE: getDifferentSNPsFromBimFiles($filename);
 
 sub getSNPsFromBimFile{
 
@@ -26,17 +28,24 @@ sub getSNPsFromBimFile{
 	my $snp_count = 0;
 	my $total_snp_count = 0;
 	
-	my $filename = "../imputation/plink/chr7From1000Genes/chr7From1000Genes.bim";
+	print "Enter the name of the BIM file:";
+	my $filename = <STDIN>;
+	chomp($filename);
+	print "Filename is $filename\n";
+	my $logfile = "BimFileHandlerLog.txt";
 	my $line;
 	my $snpID;
 	my $pos;
 	my @elements;
+	my $timestamp = localtime(time); 
+	my $pwd = getcwd;
 	
 	use constant START_POSITION => 49366316; #50 MB to left of SNP of interest
 	use constant END_POSITION => 149366316;	#50 MB to the right of SNP of interest
 	
-	open INPUT, $filename or die "Unable to open $filename. Exiting\n";
-
+	open (INPUT, "$filename") or die "Unable to open $filename. Exiting\n";
+	
+	
 	foreach $line (<INPUT>){
  		chomp($line);
 		@elements = split(/\t/, $line);
@@ -50,8 +59,16 @@ sub getSNPsFromBimFile{
 		}
 		++$total_snp_count;	
 	}
-	close INPUT;
-		
+	
+	#Commenting out all LOGging commands because stupid thing doesn't work
+	#	open (LOG, "<<$logfile") or die "$!";
+	
+	#	print LOG "getSNPsFromFile invoked on $filename at $timestamp\n";
+	#	print LOG "Found $snp_count SNPs in area of interest\n";
+	
+	#	close LOG;	
+	
+	close INPUT;	
 	return %snpMap;
 }
 
