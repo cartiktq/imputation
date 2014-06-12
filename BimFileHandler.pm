@@ -83,18 +83,13 @@ sub findDifferenceBetweenSnpSets{
 	my $i;
 	my $j;
 	my $found = 0;
+	my $key1;
 	
-	for($i = 0; $i <= $#keys1; $i++){
-		for($j = 0; $j <= $#keys2; $j++){
-			if($keys1[$i] eq $keys2[$j]){
-				$found = 1;
-				last;
-			}
+	foreach $key1 (@keys1){
+		if(!defined($map2{$key1}) && $key1 =~ /rs[0-9]+/){
+			push(@dif, "$map1{$key1}");
 		}
-		if($found eq 0 && $keys1[$i] !~ /cnvi/){
-			push(@dif, "$map1{$keys1[$i]}");
-		}
-	}
+	}	
 	
 	return @dif;
 }
